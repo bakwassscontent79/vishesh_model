@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart Disease Prediction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Plotly JS -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+
+  <div class="container py-10">
+    <h1 class="text-4xl font-bold text-center mb-10 text-teal-400">Heart Disease Prediction Dashboard</h1>
+
+    <form method="POST" action="/admin/heart-disease/predict" enctype="multipart/form-data" class="mb-6 bg-gray-800 p-5 rounded-lg shadow-lg">
+      <label class="block mb-2 text-lg font-medium">Upload Heart Disease CSV File:</label>
+      <input type="file" name="file" class="form-control mb-3" required>
+      <button type="submit" class="btn btn-success">Predict</button>
+    </form>
+
+    {% if tables %}
+    <div class="bg-white text-black p-4 rounded shadow mb-8 overflow-x-auto">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Model Evaluation Results</h2>
+      {{ tables[0]|safe }}
+    </div>
+    {% endif %}
+
+    {% if csv_path %}
+    <div class="mb-6">
+      <a href="/admin/heart-disease/download-csv?path={{ csv_path }}" class="btn btn-warning">Download Processed CSV</a>
+    </div>
+    {% endif %}
+
+    {% if roc_data %}
+    <div class="p-4 bg-gray-800 rounded shadow">
+      <h2 class="text-xl font-bold text-teal-300 mb-4">ROC Curves</h2>
+      <div id="roc-chart" style="height: 500px;"></div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if roc_data %}
+  <script>
+    const rocData = JSON.parse('{{ roc_data | safe }}');
+    const traces = rocData.map(item => ({
+      x: item.fpr,
+      y: item.tpr,
+      mode: 'lines',
+      name: `${item.name} (AUC=${item.auc.toFixed(2)})`
+    }));
+
+    const layout = {
+      title: 'ROC Curve Comparison',
+      xaxis: { title: 'False Positive Rate' },
+      yaxis: { title: 'True Positive Rate' },
+      paper_bgcolor: '#1f2937',
+      plot_bgcolor: '#1f2937',
+      font: { color: 'white' }
+    };
+
+    Plotly.newPlot('roc-chart', traces, layout);
+  </script>
+  {% endif %}
+
+</body>
+</html>
