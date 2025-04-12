@@ -1,6 +1,6 @@
 # vishesh_model
 
-# 🫀 Heart Disease Prediction App
+# Byte Fixer - fast, clean, and effortless
 
 This Flask-based web application allows you to **upload a CSV dataset**, automatically **preprocess the data**, **train machine learning models**, and visualize their performance through **interactive evaluation metrics** and **ROC curves**.
 
